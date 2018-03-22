@@ -14,6 +14,8 @@ select
 from geo_cities
 where name in ('East Point', 'Atlanta');
 
+select * from geo_greenspace;
+
 -- Finds the greenspaces within a specified city...
 with city as
 (
@@ -21,9 +23,82 @@ with city as
   from geo_cities
   where name = 'Atlanta'
 )
-select b.name, b.owner
-from city as a, geo_greenspace as b
+select b.objectid, b.name, b.owner, b.management, b.type, b.geom
+--select count(*) as cnt
+from city as a cross join geo_greenspace as b
 where st_contains(a.geom, b.geom);
+-- 488
+
+with city as
+(
+  select *
+  from geo_cities
+  where name = 'Atlanta'
+)
+select b.name, b.owner
+--select count(*) as cnt
+from city as a cross join geo_greenspace as b
+where st_covers(a.geom, b.geom);
+-- 488
+
+with city as
+(
+  select *
+  from geo_cities
+  where name = 'Atlanta'
+)
+select b.name, b.owner
+--select count(*) as cnt
+from city as a cross join geo_greenspace as b
+where st_containsproperly(a.geom, b.geom);
+-- 488
+
+with city as
+(
+  select *
+  from geo_cities
+  where name = 'Atlanta'
+)
+select b.name, b.owner
+--select count(*) as cnt
+from city as a cross join geo_greenspace as b
+where st_touches(a.geom, b.geom);
+-- 0
+
+with city as
+(
+  select *
+  from geo_cities
+  where name = 'Atlanta'
+)
+select b.name, b.owner
+--select count(*) as cnt
+from city as a cross join geo_greenspace as b
+where st_crosses(a.geom, b.geom);
+-- 0
+
+-- drop table atl_greenspaces
+
+with city as
+(
+  select *
+  from geo_cities
+  where name = 'Atlanta'
+)
+select b.objectid, b.name, b.owner, b.management, b.type, b.geom
+into atl_greenspaces
+from city as a cross join geo_greenspace as b
+where st_intersects(a.geom, b.geom);
+-- 501
+
+
+select name, geom
+into atl_limits
+from geo_cities
+where name = 'Atlanta'
+
+select st_asgeojson(geom)
+from output;
 
 
 -- Checking on distance between two parks...
@@ -38,7 +113,6 @@ brookdale_park AS
 select
   st_distance_sphere(piedmont_park.geom, brookdale_park.geom) * .00062137119223733 as distance
 from brookdale_park, piedmont_park;
-
 
 select
   name,
