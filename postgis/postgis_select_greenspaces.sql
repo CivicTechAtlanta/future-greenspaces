@@ -16,8 +16,3 @@ where st_contains(a.geom, b.geom)
 
 select *
 from atl_greenspaces;
-
-
-
-
-
