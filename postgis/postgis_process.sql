@@ -144,3 +144,8 @@ where a.table_name like 'geo%'
 select *
 from geo_greenspace
 where name = 'Piedmont Park';
+
+select *
+from geo_total_pop2016;
+
+vacuum full analyse;
