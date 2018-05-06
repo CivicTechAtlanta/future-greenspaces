@@ -10,11 +10,19 @@ select
   st_npoints((geom)),
   st_geometrytype(geom),
   st_astext(geom),
+  st_srid((geom)),
   st_isvalid(geom) as isvalid
 from geo_cities
 where name in ('East Point', 'Atlanta');
 
-select * from geo_greenspace;
+select *
+from geo_greenspace
+where owner = 'City of Atlanta';
+
+select *
+from geo_greenspace;
+
+-- drop table atl_greenspaces;
 
 -- Finds the greenspaces within a specified city...
 with city as
@@ -23,11 +31,22 @@ with city as
   from geo_cities
   where name = 'Atlanta'
 )
-select b.objectid, b.name, b.owner, b.management, b.type, b.geom
+select distinct b.objectid, b.name, b.owner, b.management, b.type, b.geom
 --select count(*) as cnt
+into atl_greenspaces
 from city as a cross join geo_greenspace as b
-where st_contains(a.geom, b.geom);
+where st_contains(a.geom, b.geom)
+--  or b.owner = 'City of Atlanta';
 -- 488
+
+/*
+Found that many greenspaces are far outside of the city of limits.
+I'm going to exclude them.
+*/
+
+select count(*) as cnt
+from atl_greenspaces
+where owner = 'City of Atlanta';
 
 with city as
 (
@@ -53,31 +72,11 @@ from city as a cross join geo_greenspace as b
 where st_containsproperly(a.geom, b.geom);
 -- 488
 
-with city as
-(
-  select *
-  from geo_cities
-  where name = 'Atlanta'
-)
-select b.name, b.owner
---select count(*) as cnt
-from city as a cross join geo_greenspace as b
-where st_touches(a.geom, b.geom);
--- 0
-
-with city as
-(
-  select *
-  from geo_cities
-  where name = 'Atlanta'
-)
-select b.name, b.owner
---select count(*) as cnt
-from city as a cross join geo_greenspace as b
-where st_crosses(a.geom, b.geom);
--- 0
-
 -- drop table atl_greenspaces
+
+select count(*)
+from stage_greenspace;
+
 
 with city as
 (
@@ -90,6 +89,7 @@ into atl_greenspaces
 from city as a cross join geo_greenspace as b
 where st_intersects(a.geom, b.geom);
 -- 501
+
 
 
 select name, geom
@@ -121,10 +121,11 @@ from geo_greenspace
 limit 15;
 
 -- Check table size...
-SELECT *, pg_size_pretty(total_bytes) AS total
-    , pg_size_pretty(index_bytes) AS INDEX
-    , pg_size_pretty(toast_bytes) AS toast
-    , pg_size_pretty(table_bytes) AS TABLE
+SELECT *,
+    pg_size_pretty(total_bytes) AS total,
+    pg_size_pretty(index_bytes) AS INDEX,
+    pg_size_pretty(toast_bytes) AS toast,
+    pg_size_pretty(table_bytes) AS TABLE
   FROM (
   SELECT *, total_bytes-index_bytes-COALESCE(toast_bytes,0) AS table_bytes FROM (
       SELECT c.oid,nspname AS table_schema, relname AS TABLE_NAME
@@ -138,3 +139,8 @@ SELECT *, pg_size_pretty(total_bytes) AS total
   ) a
 where a.table_name like 'geo%'
 ) a;
+
+
+select *
+from geo_greenspace
+where name = 'Piedmont Park';
