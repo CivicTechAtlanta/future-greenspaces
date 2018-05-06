@@ -40,7 +40,7 @@ where not st_contains(a.geom, b.geom);
 -- are all good. I'm going to include them all.
 ------------------------------------------------------------------
 drop table if exists atl_parcels;
--- Lets verify this...
+
 select distinct objectid, address1, address2, geom
 into atl_parcels
 from geo_parcels;
