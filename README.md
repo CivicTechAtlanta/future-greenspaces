@@ -1,6 +1,6 @@
 # future-greenspaces
 
-This project was started at the greenspaces hackaton.
+This project was presented by the City of Atlanta at the Greenspaces Hackathon. The City of Atlanta would like to have all residents live within a half mile of a greenspace by 2022.
 
 __Goal:__ Identify minimum amount of acres required to full coverage and their respective locations
 
@@ -14,4 +14,4 @@ __Constraints:__
 - Max walking distance - 0.5 from GS border
 - No topography
 
-Please see Wiki page for more details.
+Please see Wiki page for more details about the project and links to some of the open data that has been identified.
